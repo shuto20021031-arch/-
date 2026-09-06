@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>めいちゃん専属・駐在夫採用プレゼン 🇸🇬</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  <!-- canvas-confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Zen Maru Gothic', 'Noto Sans JP', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    /* YESボタンの発光アニメーション */
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(244, 63, 94, 0.45); }
+      50% { box-shadow: 0 0 30px rgba(244, 63, 94, 0.8); }
+    }
+    .glow-pulse {
+      animation: glowPulse 2s infinite ease-in-out;
+    }
+
+    /* NOボタンの移動トランジション */
+    #btn-no {
+      transition: top 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  left 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  transform 0.15s ease-out;
+      will-change: top, left, transform;
+    }
+
+    /* スライド切り替えアニメーション */
+    .slide-enter {
+      animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* スクロールバー非表示 */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    body {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rose: {
+              50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af',
+              400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-rose-50 via-slate-50 to-orange-50 text-slate-800 flex items-center justify-center p-3 sm:p-6 antialiased">
+
+  <!-- メインコンテナ -->
+  <main id="app-container" class="w-full max-w-2xl bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-rose-100 overflow-hidden relative transition-all duration-500">
+
+    <!-- ============================================== -->
+    <!-- STEP 0: オープニング質問画面 -->
+    <!-- ============================================== -->
+    <section id="step-opening" class="p-6 sm:p-10 text-center transition-opacity duration-500 flex flex-col justify-between min-h-[540px]">
+      
+      <!-- 上部バッジ & タイトル -->
+      <div>
+        <div class="inline-block bg-rose-100 text-rose-600 text-xs sm:text-sm font-black px-4 py-1.5 rounded-full mb-5 shadow-sm border border-rose-200 tracking-wider">
+          🇸🇬 SPECIAL PRESENTATION FOR MEI
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-800 leading-snug mb-6">
+          しゅうしゅうからめいちゃんへお届けする<br>重要なお知らせ
+        </h1>
+        
+        <div class="bg-rose-50/60 border border-rose-100 rounded-2xl p-5 mb-2 max-w-lg mx-auto">
+          <p class="text-lg sm:text-xl font-black text-slate-800 leading-snug">
+            Q. しゅうしゅうは今、<br>
+            <span class="text-rose-600 border-b-4 border-rose-300 pb-0.5">シンガポール</span> に行きたいでしょうか？
+          </p>
+        </div>
+        <p class="text-slate-400 text-xs sm:text-sm font-bold mt-2">
+          ※めいちゃんの直感でお答えください（正直にね！）
+        </p>
+      </div>
+
+      <!-- ボタン配置エリア（初期は美しい横並び、NOが逃げ回るステージ領域） -->
+      <div id="button-stage" class="relative w-full h-44 my-4 flex items-center justify-center gap-4 sm:gap-8 rounded-2xl bg-slate-50/50 border border-dashed border-rose-200/80 p-4 overflow-hidden">
+        
+        <!-- YES ボタン（固定） -->
+        <button id="btn-yes" class="glow-pulse bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black text-lg sm:text-xl px-8 sm:px-10 py-4 rounded-2xl shadow-xl hover:shadow-2xl active:scale-95 transition-all flex items-center gap-2 cursor-pointer z-10">
+          <span>YES !!</span>
+          <span class="text-xs sm:text-sm bg-white/20 px-2 py-0.5 rounded-full">（行きたい！）</span>
+        </button>
+
+        <!-- NO ボタン（初期は横並び、触れると絶対座標に切り替わってステージ内を逃走） -->
+        <button id="btn-no" class="bg-slate-200 hover:bg-slate-300 text-slate-600 font-bold text-sm sm:text-base px-6 py-4 rounded-2xl shadow border border-slate-300 cursor-pointer select-none whitespace-nowrap z-20">
+          <span id="no-text">NO（興味なし）</span>
+        </button>
+
+      </div>
+
+      <!-- 逃げた際のツッコミ文言表示 -->
+      <div>
+        <div id="escape-message" class="h-6 text-xs sm:text-sm text-rose-500 font-bold opacity-0 transition-opacity">
+          ※ あれれ？NOが押せない…！？
+        </div>
+        <p class="text-xs text-slate-400 font-bold mt-3">
+          Presented with all my heart by しゅうしゅう 🐾
+        </p>
+      </div>
+    </section>
+
+
+    <!-- ============================================== -->
+    <!-- STEP 1〜7: プレゼン本編スライド -->
+    <!-- ============================================== -->
+    <section id="step-presentation" class="hidden flex-col justify-between transition-opacity duration-500 min-h-[580px]">
+      
+      <!-- ヘッダー進行状況バー -->
+      <div class="bg-slate-50 p-4 sm:p-5 border-b border-slate-100">
+        <div class="flex justify-between items-center mb-2 text-xs font-bold">
+          <span class="text-rose-600 tracking-wider">🇸🇬 めいちゃん専属・駐在夫採用 企画提案書</span>
+          <span id="slide-counter" class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full font-black">1 / 7</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+          <div id="progress-bar" class="bg-gradient-to-r from-rose-500 to-red-500 h-2 rounded-full transition-all duration-300 w-[14.28%]"></div>
+        </div>
+      </div>
+
+      <!-- スライドコンテンツ本体 -->
+      <div id="slide-container" class="p-5 sm:p-8 flex-1 flex flex-col justify-center max-h-[70vh] overflow-y-auto">
+
+        <!-- Slide 1: 提案サマリー -->
+        <div class="slide active slide-enter" data-slide="1">
+          <div class="text-center py-4">
+            <div class="inline-block bg-rose-50 text-rose-600 border border-rose-200 px-4 py-1.5 rounded-full text-xs font-black mb-4">
+              EXECUTIVE SUMMARY
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-800 leading-snug mb-5">
+              めいちゃん専属・駐在夫<br class="sm:hidden"/>配備に関する稟議書
+            </h2>
+            <div class="bg-rose-50/80 border-l-4 border-rose-500 p-5 rounded-r-2xl shadow-sm text-left max-w-lg mx-auto">
+              <h3 class="text-xs font-black text-rose-700 uppercase tracking-wider mb-2">【ご提案の核心】</h3>
+              <p class="text-base sm:text-lg leading-relaxed font-black text-slate-800">
+                「しゅうしゅうの採用により、<br>
+                <span class="text-rose-600 border-b-2 border-rose-300">めいちゃんたちの生活のQOL</span> を<br>
+                劇的に向上させたいと思います！」
+              </p>
+            </div>
+            <p class="text-xs text-slate-500 mt-5">
+              シンガポールで責任ある仕事を頑張るめいちゃんを全力でバックアップします。
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 2: 課題認識とリスク対策 -->
+        <div class="slide hidden" data-slide="2">
+          <h2 class="text-xl sm:text-2xl font-black text-slate-800 mb-4 border-b pb-2 border-slate-100">
+            課題認識とリスク対策 🛡️
+          </h2>
+          <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4">
+            <div class="text-xs font-black text-amber-800 mb-1">【めいちゃんの懸念点（想定リスク）】</div>
+            <p class="text-sm font-bold text-slate-700">
+              「しゅうしゅうが現地でまた変なことをしないか？」という心配
+            </p>
+          </div>
+          <div class="bg-white border-2 border-emerald-100 rounded-2xl p-4 space-y-2.5 shadow-sm">
+            <div class="text-xs font-black text-emerald-700 flex items-center gap-1.5">
+              <span>✅</span> しゅうしゅうのコミットメント
+            </div>
+            <ul class="text-xs sm:text-sm text-slate-600 space-y-2 font-medium">
+              <li class="flex items-start gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span class="text-rose-500 font-bold">1.</span>
+                <div><strong class="text-slate-800">毎日の行動報告の徹底：</strong> 今日やったこと・予定をクリアに共有します。</div>
+              </li>
+              <li class="flex items-start gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span class="text-rose-500 font-bold">2.</span>
+                <div><strong class="text-slate-800">見守りカメラの設置：</strong> お留守番中の様子や部屋の状況をいつでも確認可能に。</div>
+              </li>
+              <li class="flex items-start gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <span class="text-rose-500 font-bold">3.</span>
+                <div><strong class="text-slate-800">何かする前の事前報告：</strong> 自己判断で暴走せず、些細なことでも必ず確認・相談します！</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Slide 3: 提供する3大バリュー -->
+        <div class="slide hidden" data-slide="3">
+          <h2 class="text-xl sm:text-2xl font-black text-rose-600 mb-4 text-center">
+            提供する3大バリュー ✨
+          </h2>
+          <div class="grid grid-cols-1 gap-3">
+            <div class="bg-rose-50/70 border border-rose-200 rounded-2xl p-3.5 flex items-start gap-3 shadow-sm">
+              <div class="text-2xl p-2 bg-white rounded-xl shadow-xs">🏠</div>
+              <div>
+                <div class="text-xs font-black text-rose-600">VALUE 01</div>
+                <div class="text-sm font-bold text-slate-800">家政・生活インフラの完全自立</div>
+                <p class="text-xs text-slate-600 mt-0.5">掃除・洗濯・日用品買い出し・温かいご飯を完備！</p>
+              </div>
+            </div>
+            <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-3.5 flex items-start gap-3 shadow-sm">
+              <div class="text-2xl p-2 bg-white rounded-xl shadow-xs">🐾</div>
+              <div>
+                <div class="text-xs font-black text-amber-700">VALUE 02</div>
+                <div class="text-sm font-bold text-slate-800">まめさんの専属執事</div>
+                <p class="text-xs text-slate-600 mt-0.5">朝夕散歩・ご飯・歯磨き・ブラッシング・24時間体制の安心ケア。</p>
+              </div>
+            </div>
+            <div class="bg-sky-50/70 border border-sky-200 rounded-2xl p-3.5 flex items-start gap-3 shadow-sm">
+              <div class="text-2xl p-2 bg-white rounded-xl shadow-xs">📣</div>
+              <div>
+                <div class="text-xs font-black text-sky-700">VALUE 03</div>
+                <div class="text-sm font-bold text-slate-800">めいちゃんのチアリーダー機能</div>
+                <p class="text-xs text-slate-600 mt-0.5">仕事の疲れを笑顔でお出迎え。愚痴や悩みを傾聴！</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 4: 費用対効果（コスパ） -->
+        <div class="slide hidden" data-slide="4">
+          <h2 class="text-xl sm:text-2xl font-black text-slate-800 mb-4 border-b pb-2 border-slate-100">
+            圧倒的な費用対効果（コスパ）💰
+          </h2>
+          <div class="space-y-3">
+            <div class="bg-gradient-to-r from-rose-500 to-red-500 text-white p-4 rounded-2xl text-center shadow-md">
+              <div class="text-xs font-bold text-rose-100 uppercase tracking-wider">しゅうしゅうが求める希望報酬</div>
+              <div class="text-3xl font-black mt-1">$10 <span class="text-lg font-bold">/ day（食事補助のみ）</span></div>
+              <div class="text-xs text-rose-100 mt-1">※それ以外は多くを求めません！</div>
+            </div>
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+              <div class="text-xs font-black text-slate-700 mb-2">【めいちゃんが得られる圧倒的メリット】</div>
+              <ul class="text-xs sm:text-sm text-slate-600 space-y-1.5 font-medium">
+                <li class="flex items-center gap-2"><span class="text-rose-500 font-bold">💖</span> 家に帰ると美味しいご飯とピカピカの部屋</li>
+                <li class="flex items-center gap-2"><span class="text-rose-500 font-bold">🐶</span> 尻尾を振るまめちよ＆しゅうしゅうがお出迎え</li>
+                <li class="flex items-center gap-2"><span class="text-rose-500 font-bold">🏖️</span> 休日もまめさんたちと一緒にカフェやお出かけを満喫</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 5: 本音のコアメッセージ（写真枠あり） -->
+        <div class="slide hidden" data-slide="5">
+          <h2 class="text-xl sm:text-2xl font-black text-rose-600 mb-3 text-center">
+            一番大切な、本音の気持ち。
+          </h2>
+          <div class="relative rounded-2xl overflow-hidden shadow-lg border-2 border-rose-200 bg-slate-100 mb-3">
+            <img 
+              src="memory_conan.jpg" 
+              alt="コナン君のベンチでの思い出" 
+              class="w-full h-auto max-h-[240px] object-cover object-center mx-auto"
+              onerror="this.onerror=null; this.src='memory_conan.png'; this.onerror=function(){ document.getElementById('conan-fallback-msg').classList.remove('hidden'); }"
+            />
+            <div id="conan-fallback-msg" class="hidden p-4 text-center text-slate-500 text-xs">
+              ※写真（memory_conan.jpg または memory_conan.png）を同じフォルダに配置すると表示されます
+            </div>
+            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent p-2 text-white text-[11px] font-bold text-center">
+              大好きなアニメの空間で、めいちゃんとまめちよと一緒に
+            </div>
+          </div>
+          <div class="bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-200 rounded-2xl p-3.5 text-center space-y-1.5">
+            <p class="text-xs sm:text-sm font-black text-slate-800 leading-relaxed">
+              「シンガポールで駐在夫をしたいというのではなく、<br>
+              <span class="text-rose-600 border-b-2 border-rose-400">シンガポールにいるめいちゃんたちと一緒に生きていきたい</span><br>
+              という気持ちが一番です。」
+            </p>
+            <p class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+              同じ空間で一緒にアニメを見たり、笑い合ったり、同じ温かい食事を食べたいです。
+            </p>
+          </div>
+        </div>
+
+        <!-- Slide 6: 推薦状 -->
+        <div class="slide hidden" data-slide="6">
+          <h2 class="text-xl sm:text-2xl font-black text-slate-800 mb-3 border-b pb-2 border-slate-100">
+            推薦状（まめちよより）🐾
+          </h2>
+          <div class="bg-amber-50/80 border-2 border-amber-200 rounded-2xl p-5 shadow-sm">
+            <div class="text-xs font-black text-amber-800 uppercase tracking-wider mb-2">RECOMMENDATION LETTER</div>
+            <div class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium space-y-2.5">
+              <p>めいちゃんへ</p>
+              <p>しゅうしゅうがシンガポールに来てくれたら、僕の美味しいご飯を作ってくれるし、一緒にたくさんお散歩にも行ってくれます。</p>
+              <p>めいちゃんがお仕事で忙しいときも、僕が寂しくならないように遊んでくれるし、お家も安全に守ってくれます。</p>
+              <p class="font-bold text-amber-900 pt-1">
+                だから僕からも、しゅうしゅうの採用を心からおすすめします！
+              </p>
+              <div class="text-right text-xs text-slate-500 font-bold pt-1">
+                永瀬まめちよ より 🐾
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 7: 契約条件と承認 -->
+        <div class="slide hidden" data-slide="7">
+          <h2 class="text-xl sm:text-2xl font-black text-rose-600 mb-3 border-b pb-2 border-slate-100">
+            契約条件の確認と承認 ✍️
+          </h2>
+          <div class="bg-white border-2 border-slate-200 rounded-2xl p-4 text-xs sm:text-sm space-y-2 mb-4">
+            <div class="flex justify-between border-b border-slate-100 pb-2">
+              <span class="text-slate-500 font-bold">役職:</span>
+              <span class="font-black text-slate-800">めいちゃん専属 駐在夫</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-100 pb-2">
+              <span class="text-slate-500 font-bold">試用期間:</span>
+              <span class="font-black text-rose-600">めいちゃんのシンガポール駐在期間</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-100 pb-2">
+              <span class="text-slate-500 font-bold">支給報酬:</span>
+              <span class="font-black text-slate-800 text-right">
+                めいちゃんたちの笑顔、美味しいご飯、温かい生活<br>
+                <span class="text-xs text-rose-600 font-bold">（＋1日10ドルの食事補助）</span>
+              </span>
+            </div>
+          </div>
+          <button id="btn-approve" class="w-full glow-pulse bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-4 px-6 rounded-2xl shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span class="text-base sm:text-lg">契約を承認する（しゅうしゅうを採用！）</span>
+            <span class="text-xl">✍️</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- コントローラー（前へ / 次へ） -->
+      <div class="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex justify-between items-center gap-4">
+        <button id="btn-prev" class="px-5 py-3 rounded-xl border border-slate-300 text-slate-600 font-bold text-xs sm:text-sm hover:bg-slate-100 disabled:opacity-30 disabled:pointer-events-none transition-all">
+          ← 前へ
+        </button>
+        <button id="btn-next" class="flex-1 max-w-xs bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black py-3 px-6 rounded-xl shadow-md active:scale-95 transition-all text-center flex items-center justify-center gap-2 text-xs sm:text-sm">
+          <span id="next-label">次へ進む</span>
+          <span>→</span>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ============================================== -->
+    <!-- STEP FINAL: 内定承認完了画面 -->
+    <!-- ============================================== -->
+    <section id="step-final" class="hidden p-5 sm:p-8 text-center transition-opacity duration-500">
+      
+      <div class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs sm:text-sm font-black shadow-sm mb-3">
+        <span>🎉 CONTRACT APPROVED</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-black text-slate-800 mb-4">
+        内定・採用ありがとうございます！！
+      </h1>
+
+      <!-- 写真：マーライオン前のしゅうしゅう＆まめちよ -->
+      <div class="relative rounded-2xl overflow-hidden shadow-lg border-2 border-slate-100 mb-5 bg-slate-100">
+        <img 
+          id="contract-photo"
+          src="11698.png" 
+          alt="マーライオンの前でまめちよと喜ぶしゅうしゅう" 
+          class="w-full h-auto max-h-[320px] object-cover object-center mx-auto"
+          onerror="this.onerror=null; document.getElementById('photo-fallback-msg').classList.remove('hidden');"
+        />
+        <div id="photo-fallback-msg" class="hidden p-5 text-center text-slate-500 text-xs">
+          ※写真（11698.png）を同じフォルダに配置すると表示されます
+        </div>
+        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900/80 via-slate-900/40 to-transparent p-2.5 text-white text-xs font-bold text-center">
+          🇸🇬 シンガポールにて：まめちよを抱っこして全力全開のしゅうしゅう
+        </div>
+      </div>
+
+      <!-- 決意メッセージ -->
+      <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 sm:p-5 text-left text-slate-700 text-xs sm:text-sm leading-relaxed mb-5 font-medium space-y-2">
+        <p class="font-bold text-rose-600 text-center sm:text-left text-sm sm:text-base">
+          めいちゃんたちのために、全身全霊で頑張ります！！
+        </p>
+        <p>
+          めいちゃん、採用してくれて本当にありがとう！<br>
+          慣れない異国の地で毎日頑張っているめいちゃんが、お家に帰ってきたら心からホッとして笑顔になれる、世界で一番温かい家庭を作ります。
+        </p>
+        <p class="font-bold text-slate-800 pt-1">
+          ・美味しいご飯を作って待っています🍳<br>
+          ・まめちよと仲良くお留守番して、たっぷりお散歩します🐶<br>
+          ・何かあれば絶対にすぐ報告します！不安にはさせません✨
+        </p>
+        <p class="text-rose-600 font-bold pt-1">
+          同じ空間でたくさん笑って、一緒にアニメを見て、美味しいものをたくさん食べようね。めいちゃん大好きです！
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-center gap-3">
+        <button id="btn-celebrate" class="flex-1 bg-gradient-to-r from-rose-500
